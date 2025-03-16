@@ -24,17 +24,7 @@ export const typeDefs = gql`
         id: ID!
         name: String!
         isInTheatres: Boolean
-        Director: String
-        releaseYear: Int
-        genre: String
-        rating: Float
-        studio: String
-        runtime: Int
-    }
-
-    input AnimeFilterInput {
-        name: String
-        Director: String
+        director: String
         releaseYear: Int
         genre: String
         rating: Float
@@ -45,12 +35,39 @@ export const typeDefs = gql`
         getAllMovies: [Movie!]!
         getAllUsers: [User!]!
         getAllAnimeMovies: [AnimeMovie!]!
-        filterMoviesByRating(rating: Float): [Movie]
-        filterAnimesByInput(filter: AnimeFilterInput): [AnimeMovie]
+        getUserById(id: ID!): User
+        getMovieById(id: ID!): Movie
+        getAnimeMovieById(id: ID!): AnimeMovie
+        filterMoviesByInput(filter: MovieInput): [Movie]
+        filterAnimesByInput(filter: AnimeMovieInput): [AnimeMovie]
+    }
+    input MovieInput {
+        name: String!
+        isInTheatres: Boolean
+        director: String
+        releaseYear: Int
+        genre: String
+        rating: Float
+    }
+    input AnimeMovieInput {
+        name: String
+        isInTheatres: Boolean
+        director: String
+        releaseYear: Int
+        genre: String
+        rating: Float
+        studio: String
+        runtime: Int
     }
     type Mutation {
         createUser(name: String!, email: String!, password: String!): User
         updateUser(id: ID!, name: String, email: String, password: String): User
         deleteUser(id: ID!): User
+        addMovie(input: MovieInput): Movie
+        addAnimeMovie(input: AnimeMovieInput): AnimeMovie
+        updateMovie(input: MovieInput): Movie
+        updateAnimeMovie(input: AnimeMovieInput): AnimeMovie
+        deleteMovie(id: ID!): Movie
+        deleteAnimeMovie(id: ID!): AnimeMovie
     }
 `;
