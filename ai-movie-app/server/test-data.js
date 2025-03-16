@@ -104,4 +104,10 @@ const animeMovies = [
     { id: "50", name: "Suzume", isInTheatres: false, Director: "Makoto Shinkai", releaseYear: 2022, genre: "Fantasy", rating: 7.8, studio: "CoMix Wave Films", runtime: 122 }
 ];
 
-export { movies, animeMovies };
+const users = [
+    { id: "1", name: "John Doe", email: "john.doe@example.com", password: "password123", role: "admin", createdAt: "2023-01-01T00:00:00Z", updatedAt: "2023-01-01T00:00:00Z", movies: [movies[0], movies[1], animeMovies[2]] },
+    { id: "2", name: "Jane Doe", email: "jane.doe@example.com", password: "password123", role: "regular", createdAt: "2023-01-01T00:00:00Z", updatedAt: "2023-01-01T00:00:00Z", movies: [movies[2], movies[3], animeMovies[4]] }
+]
+
+
+export { movies, animeMovies, users };
