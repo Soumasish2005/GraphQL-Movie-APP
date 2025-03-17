@@ -1,4 +1,4 @@
-import  { movies, animeMovies, users } from '../data/test-data.js';
+import { movies, animeMovies, users } from '../data/test-data.js';
 
 export const resolvers = {
     Query: {
@@ -10,9 +10,6 @@ export const resolvers = {
         },
         getAllAnimeMovies: () => {
             return animeMovies;
-        },
-        filterMoviesByRating: (_,{ rating }) => {
-            return movies.filter((movie) => movie.rating >= rating);
         },
         filterAnimesByInput: (_, { filter }) => {
             return animeMovies.filter(anime => 
@@ -65,6 +62,22 @@ export const resolvers = {
             // const users = users.filter(user => user.id !== id);
             // return users;
             return deletedUser;
+        },
+        addMovie: (_, { input }) => {
+            const { name, director , releaseYear , genre , rating, isInTheatres } = input;
+            console.log("Input arguments:", { name, director, releaseYear, genre, rating, isInTheatres });
+            const newMovie = {
+                id: String(movies.length + 1),
+                name,
+                director,
+                releaseYear,
+                genre,
+                rating,
+                isInTheatres
+            };
+            console.log("New movie object:", newMovie);
+            movies.unshift(newMovie);
+            return newMovie;
         }
     }
 }
