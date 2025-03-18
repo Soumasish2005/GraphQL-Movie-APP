@@ -1,4 +1,4 @@
-import { movies, animeMovies, users } from '../data/test-data.js';
+import { movies, users } from '../data/test-data.js';
 
 export const resolvers = {
     Query: {
@@ -8,18 +8,15 @@ export const resolvers = {
         getAllUsers: () => {
             return users;
         },
-        getAllAnimeMovies: () => {
-            return animeMovies;
-        },
-        filterAnimesByInput: (_, { filter }) => {
-            return animeMovies.filter(anime => 
-                (!filter.name || anime.name.toLowerCase().includes(filter.name.toLowerCase())) &&
-                (!filter.Director || anime.Director.toLowerCase().includes(filter.Director.toLowerCase())) &&
-                (!filter.releaseYear || anime.releaseYear === filter.releaseYear) &&
-                (!filter.genre || anime.genre.toLowerCase().includes(filter.genre.toLowerCase())) &&
-                (!filter.rating || anime.rating >= filter.rating) &&
-                (!filter.studio || anime.studio.toLowerCase().includes(filter.studio.toLowerCase())) &&
-                (!filter.runtime || anime.runtime >= filter.runtime)
+        filterMoviesByInput: (_, { filter }) => {
+            return movies.filter(movie => 
+                (!filter.name || movie.name.toLowerCase().includes(filter.name.toLowerCase())) &&
+                (!filter.Director || movie.Director.toLowerCase().includes(filter.Director.toLowerCase())) &&
+                (!filter.releaseYear || movie.releaseYear === filter.releaseYear) &&
+                (!filter.genre || movie.genre.toLowerCase().includes(filter.genre.toLowerCase())) &&
+                (!filter.rating || movie.rating >= filter.rating) &&
+                (!filter.studio || movie.studio.toLowerCase().includes(filter.studio.toLowerCase())) &&
+                (!filter.runtime || movie.runtime >= filter.runtime)
             );
         }
     },
@@ -65,7 +62,6 @@ export const resolvers = {
         },
         addMovie: (_, { input }) => {
             const { name, director , releaseYear , genre , rating, isInTheatres } = input;
-            console.log("Input arguments:", { name, director, releaseYear, genre, rating, isInTheatres });
             const newMovie = {
                 id: String(movies.length + 1),
                 name,
@@ -75,7 +71,6 @@ export const resolvers = {
                 rating,
                 isInTheatres
             };
-            console.log("New movie object:", newMovie);
             movies.unshift(newMovie);
             return newMovie;
         }
