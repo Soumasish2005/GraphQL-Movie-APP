@@ -3,32 +3,39 @@ import { expressMiddleware } from '@apollo/server/express4';
 import { typeDefs } from './schema/typeDefs.js';
 import { resolvers } from './schema/resolvers.js';
 import connectDB from './db/connection.js';
+import createTables from './db/createTables.js'; // Import createTables
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 
 dotenv.config();
-// Connect to the database
-connectDB();
 
-const app = express();
-const server = new ApolloServer({
+const startServer = async () => {
+  // Connect to the database
+  await connectDB();
+  await createTables(); // Ensure tables are created
+
+  const app = express();
+  const server = new ApolloServer({
     typeDefs,
     resolvers
-});
+  });
 
-await server.start();
+  await server.start();
 
-app.use(
+  app.use(
     '/graphql',
     cors(),
     bodyParser.json(),
     expressMiddleware(server)
-);
+  );
 
-const PORT = process.env.PORT || 4000;
+  const PORT = process.env.PORT || 4000;
 
-app.listen({ port: PORT }, () => {
+  app.listen({ port: PORT }, () => {
     console.log(`GraphQL server running on http://localhost:4000/graphql`);
-});
+  });
+};
+
+startServer();

@@ -20,12 +20,12 @@ const config = {
     },
 };
 
-const client = new pg.Client(config);
-
 const connectDB = async () => {
+    const client = new pg.Client(config);
     try {
         await client.connect();
         console.log('PostgreSQL connected');
+        return client;
     } catch (err) {
         console.error('PostgreSQL connection error:', err);
         process.exit(1);
