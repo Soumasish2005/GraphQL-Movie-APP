@@ -11,9 +11,9 @@ export const resolvers = {
         filterMoviesByInput: (_, { filter }) => {
             return movies.filter(movie => 
                 (!filter.name || movie.name.toLowerCase().includes(filter.name.toLowerCase())) &&
-                (!filter.Director || movie.Director.toLowerCase().includes(filter.Director.toLowerCase())) &&
+                (!filter.director || movie.director.toLowerCase().includes(filter.director.toLowerCase())) &&
                 (!filter.releaseYear || movie.releaseYear === filter.releaseYear) &&
-                (!filter.genre || movie.genre.toLowerCase().includes(filter.genre.toLowerCase())) &&
+                (!filter.genre || filter.genre.every(g => movie.genre.includes(g))) &&
                 (!filter.rating || movie.rating >= filter.rating) &&
                 (!filter.studio || movie.studio.toLowerCase().includes(filter.studio.toLowerCase())) &&
                 (!filter.runtime || movie.runtime >= filter.runtime)
@@ -61,7 +61,7 @@ export const resolvers = {
             return deletedUser;
         },
         addMovie: (_, { input }) => {
-            const { name, director , releaseYear , genre , rating, isInTheatres } = input;
+            const { name, director, releaseYear, genre, rating, isInTheatres, studio, runtime } = input;
             const newMovie = {
                 id: String(movies.length + 1),
                 name,
@@ -69,10 +69,12 @@ export const resolvers = {
                 releaseYear,
                 genre,
                 rating,
-                isInTheatres
+                isInTheatres,
+                studio,
+                runtime
             };
             movies.unshift(newMovie);
             return newMovie;
         }
     }
-}
+};
