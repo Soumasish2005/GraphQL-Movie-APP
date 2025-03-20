@@ -21,7 +21,7 @@ const startServer = async () => {
     typeDefs,
     resolvers,
     context: async () => {
-      return { db }; // Passing db connection tocontext
+      return { db }; // Passing db connection context
     }
   });
 
