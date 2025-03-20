@@ -12,14 +12,17 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const startServer = async () => {
-  // Connect to the database
-  await connectDB();
-  await createTables(); // Ensure tables are created
+  // Connecting to the database
+  const db = await connectDB();
+  await createTables(); // Creating tables
 
   const app = express();
   const server = new ApolloServer({
     typeDefs,
-    resolvers
+    resolvers,
+    context: async () => {
+      return { db }; // Passing db connection tocontext
+    }
   });
 
   await server.start();
@@ -28,7 +31,11 @@ const startServer = async () => {
     '/graphql',
     cors(),
     bodyParser.json(),
-    expressMiddleware(server)
+    expressMiddleware(server, {
+      context: async () => {
+        return { db }; // Passing db connection context
+      }
+    })
   );
 
   const PORT = process.env.PORT || 4000;

@@ -12,7 +12,6 @@ const createTables = async () => {
     `;
     const res = await client.query(checkTablesQuery);
     if (res.rows[0].exists) {
-      console.log('Tables already exist');
       return;
     }
 

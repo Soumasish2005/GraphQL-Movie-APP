@@ -1,9 +1,19 @@
 import { movies, users } from '../data/test-data.js';
+import writeToDB from '../db/writeToDB.js';
+import connectDB from '../db/connection.js';
 
 export const resolvers = {
     Query: {
-        getAllMovies: () => {
-            return movies;
+        getAllMovies: async (_, __, { db }) => {
+            try {
+                console.log('Fetching all movies from the database...');
+                const res = await db.query('SELECT * FROM movies');
+                console.log('Movies fetched successfully:', res.rows);
+                return res.rows;
+            } catch (err) {
+                console.error('Error fetching movies:', err);
+                throw new Error('Error fetching movies');
+            }
         },
         getAllUsers: () => {
             return users;
@@ -21,7 +31,7 @@ export const resolvers = {
         }
     },
     Mutation: {
-        createUser: (_, { name, email, password, role }) => {
+        createUser: async (_, { name, email, password, role }) => {
             const newUser = {
                 id: String(users.length + 1),
                 name,
@@ -33,9 +43,16 @@ export const resolvers = {
                 movies: []
             };
             users.unshift(newUser);
+            const query = `
+                INSERT INTO users (name, email, password, role, createdAt, updatedAt)
+                VALUES ($1, $2, $3, $4, $5, $6)
+                RETURNING *;
+            `;
+            const values = [name, email, password, role || 'regular', new Date().toISOString(), new Date().toISOString()];
+            await writeToDB(query, values);
             return newUser;
         },
-        updateUser: (_, { id, name, email, password }) => {
+        updateUser: async (_, { id, name, email, password }) => {
             const userIndex = users.findIndex(user => user.id === id);
             if (userIndex === -1) {
                 throw new Error('User not found');
@@ -48,19 +65,33 @@ export const resolvers = {
                 updatedAt: new Date().toISOString()
             };
             users[userIndex] = updatedUser;
+            const query = `
+                UPDATE users
+                SET name = $1, email = $2, password = $3, updatedAt = $4
+                WHERE id = $5
+                RETURNING *;
+            `;
+            const values = [name || users[userIndex].name, email || users[userIndex].email, password || users[userIndex].password, new Date().toISOString(), id];
+            await writeToDB(query, values);
             return updatedUser;
         },
-        deleteUser: (_, { id }) => {
+        deleteUser: async (_, { id }) => {
             const userIndex = users.findIndex(user => user.id === id);
             if (userIndex === -1) {
                 throw new Error('User not found');
             }
             const deletedUser = users[userIndex];
-            // const users = users.filter(user => user.id !== id);
-            // return users;
+            users.splice(userIndex, 1);
+            const query = `
+                DELETE FROM users
+                WHERE id = $1
+                RETURNING *;
+            `;
+            const values = [id];
+            await writeToDB(query, values);
             return deletedUser;
         },
-        addMovie: (_, { input }) => {
+        addMovie: async (_, { input }) => {
             const { name, director, releaseYear, genre, rating, isInTheatres, studio, runtime } = input;
             const newMovie = {
                 id: String(movies.length + 1),
@@ -74,6 +105,13 @@ export const resolvers = {
                 runtime
             };
             movies.unshift(newMovie);
+            const query = `
+                INSERT INTO movies (name, director, releaseYear, genre, rating, isInTheatres, studio, runtime)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                RETURNING *;
+            `;
+            const values = [name, director, releaseYear, genre, rating, isInTheatres, studio, runtime];
+            await writeToDB(query, values);
             return newMovie;
         }
     }
