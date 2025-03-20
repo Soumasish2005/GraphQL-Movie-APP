@@ -13,6 +13,10 @@ export const typeDefs = gql`
         downloadedMovies: [Movie]
         watchList: [Movie]
     }
+    enum role{
+        REGULAR
+        ADMIN
+    }
     type Comment{
         id: ID!
         user: User
@@ -24,6 +28,7 @@ export const typeDefs = gql`
     type Movie{
         id: ID!
         name: String!
+        description: String
         isInTheatres: Boolean
         director: String
         releaseYear: Int
@@ -32,6 +37,9 @@ export const typeDefs = gql`
         rating: Float
         studio: String
         runtime: Int
+        thumbnail: String
+        downloadLinks: [String]
+        watchLinks: [String]
     }
     input MovieInput {
         name: String
@@ -44,12 +52,13 @@ export const typeDefs = gql`
         runtime: Int
     }
     type Query {
-        getAllMovies: [Movie!]!
         getAllUsers: [User!]!
         getUserWatchList(id: ID!): [Movie]
         getUserWatchedMovies(id: ID!): [Movie]
         getUserDownloadedMovies(id: ID!): [Movie]
         getUserById(id: ID!): User
+
+        getAllMovies: [Movie!]!
         getMovieById(id: ID!): Movie
         filterMoviesByInput(filter: MovieInput): [Movie]
     }
@@ -57,14 +66,17 @@ export const typeDefs = gql`
         createUser(name: String!, email: String!, password: String!): User
         updateUser(id: ID!, name: String, email: String, password: String): User
         deleteUser(id: ID!): User
-        addMovie(input: MovieInput): Movie
-        updateMovie(input: MovieInput): Movie
-        deleteMovie(id: ID!): Movie
+
+        
         addToWatchList(userId: ID!, movieId: ID!): User
         removeFromWatchList(userId: ID!, movieId: ID!): User
         addToWatchedMovies(userId: ID!, movieId: ID!): User
         removeFromWatchedMovies(userId: ID!, movieId: ID!): User
         addToDownloadedMovies(userId: ID!, movieId: ID!): User
         removeFromDownloadedMovies(userId: ID!, movieId: ID!): User
+        
+        addMovie(input: MovieInput): Movie
+        updateMovie(input: MovieInput): Movie
+        deleteMovie(id: ID!): Movie
     }
 `;
