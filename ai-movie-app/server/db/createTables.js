@@ -23,10 +23,10 @@ const createTables = async () => {
         password VARCHAR(100) NOT NULL,
         "watchedMovies" JSONB DEFAULT '[]',
         "downloadedMovies" JSONB DEFAULT '[]',
-        "watchList" JSONB DEFAULT '[]'
+        "watchList" JSONB DEFAULT '[]',
         role VARCHAR(50),
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
 
@@ -34,8 +34,8 @@ const createTables = async () => {
       CREATE TABLE IF NOT EXISTS movies (
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
-        description VARCHAR(255)
-        director VARCHAR(100),
+        description VARCHAR(255),
+        directors VARCHAR(100)[],
         "releaseYear" INT,
         "isInTheatres" BOOLEAN,
         runtime INT,
@@ -45,6 +45,7 @@ const createTables = async () => {
         thumbnail VARCHAR(255),
         "downloadLinks" VARCHAR(255)[],
         "watchLinks" VARCHAR(255)[],
+        UNIQUE (name, "releaseYear")
       );
     `);
 

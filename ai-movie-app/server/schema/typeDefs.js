@@ -30,7 +30,7 @@ export const typeDefs = gql`
         name: String!
         description: String
         isInTheatres: Boolean
-        director: String
+        directors: [String]
         releaseYear: Int
         genre: [String]
         comments: [Comment]
@@ -44,7 +44,7 @@ export const typeDefs = gql`
     input MovieInput {
         name: String
         isInTheatres: Boolean
-        director: String
+        directors: [String]
         releaseYear: Int
         genre: [String]
         rating: Float

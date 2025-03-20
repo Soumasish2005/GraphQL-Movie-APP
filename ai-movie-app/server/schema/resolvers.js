@@ -1,6 +1,5 @@
 import { movies, users } from '../data/test-data.js';
 import writeToDB from '../db/writeToDB.js';
-import connectDB from '../db/connection.js';
 
 export const resolvers = {
     Query: {
@@ -100,7 +99,7 @@ export const resolvers = {
             return deletedUser;
         },
         addMovie: async (_, { input }) => {
-            const { name, director, releaseYear, genre, rating, isInTheatres, studio, runtime } = input;
+            const { name, directors, releaseYear, genre, rating, isInTheatres, studio, runtime } = input;
             // const newMovie = {
             //     id: String(movies.length + 1),
             //     name,
@@ -114,13 +113,14 @@ export const resolvers = {
             // };
             // movies.unshift(newMovie);
             const query = `
-                INSERT INTO movies ("name", "director", "releaseYear", "genre", "rating", "isInTheatres", "studio", "runtime")
+                INSERT INTO movies ("name", "directors", "releaseYear", "genre", "rating", "isInTheatres", "studio", "runtime")
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                 RETURNING *;
             `;
-            const values = [name, director, releaseYear, genre, rating, isInTheatres, studio, runtime];
-            await writeToDB(query, values);
-            return newMovie;
+            const values = [name, directors, releaseYear, genre, rating, isInTheatres, studio, runtime];
+            const res = await writeToDB(query, values);
+            console.log(res)
+            return res;
         }
     }
 };
