@@ -15,8 +15,16 @@ export const resolvers = {
                 throw new Error('Error fetching movies');
             }
         },
-        getAllUsers: () => {
-            return users;
+        getAllUsers: async (_, __, { db }) => {
+            try {
+                console.log('Fetching all users from the database...');
+                const res = await db.query('SELECT * FROM users');
+                console.log('Users fetched successfully:', res.rows);
+                return res.rows;
+            } catch (err) {
+                console.error('Error fetching users:', err);
+                throw new Error('Error fetching users');
+            }
         },
         filterMoviesByInput: (_, { filter }) => {
             return movies.filter(movie => 
@@ -44,7 +52,7 @@ export const resolvers = {
             };
             users.unshift(newUser);
             const query = `
-                INSERT INTO users (name, email, password, role, createdAt, updatedAt)
+                INSERT INTO users ("name", "email", "password", "role", "createdAt", "updatedAt")
                 VALUES ($1, $2, $3, $4, $5, $6)
                 RETURNING *;
             `;
@@ -106,7 +114,7 @@ export const resolvers = {
             };
             movies.unshift(newMovie);
             const query = `
-                INSERT INTO movies (name, director, releaseYear, genre, rating, isInTheatres, studio, runtime)
+                INSERT INTO movies ("name", "director", "releaseYear", "genre", "rating", "isInTheatres", "studio", "runtime")
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                 RETURNING *;
             `;

@@ -22,11 +22,11 @@ const createTables = async () => {
         email VARCHAR(100) NOT NULL UNIQUE,
         password VARCHAR(100) NOT NULL,
         role VARCHAR(50),
-        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        watchedMovies JSONB DEFAULT '[]',
-        downloadedMovies JSONB DEFAULT '[]',
-        watchList JSONB DEFAULT '[]'
+        "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        "watchedMovies" JSONB DEFAULT '[]',
+        "downloadedMovies" JSONB DEFAULT '[]',
+        "watchList" JSONB DEFAULT '[]'
       );
     `);
 
@@ -34,9 +34,9 @@ const createTables = async () => {
       CREATE TABLE IF NOT EXISTS movies (
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
-        isInTheatres BOOLEAN,
+        "isInTheatres" BOOLEAN,
         director VARCHAR(100),
-        releaseYear INT,
+        "releaseYear" INT,
         genre VARCHAR(100)[],
         rating FLOAT,
         studio VARCHAR(100),
@@ -47,11 +47,11 @@ const createTables = async () => {
     await client.query(`
       CREATE TABLE IF NOT EXISTS comments (
         id SERIAL PRIMARY KEY,
-        userId INT REFERENCES users(id),
-        movieId INT REFERENCES movies(id),
+        "userId" INT REFERENCES users(id),
+        "movieId" INT REFERENCES movies(id),
         text TEXT,
-        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
 
