@@ -35,7 +35,20 @@ export const resolvers = {
                 (!filter.studio || movie.studio.toLowerCase().includes(filter.studio.toLowerCase())) &&
                 (!filter.runtime || movie.runtime >= filter.runtime)
             );
-        }
+        },
+        getCommentsByMovieId: async (_, { movieId }, { db }) => {
+            try {
+                console.log(`Fetching comments for movie ID ${movieId} from the database...`);
+                const query = 'SELECT * FROM comments WHERE "movieId" = $1';
+                const values = [movieId];
+                const res = await db.query(query, values);
+                console.log('Comments fetched successfully:', res.rows);
+                return res.rows;
+            } catch (err) {
+                console.error('Error fetching comments:', err);
+                throw new Error('Error fetching comments');
+            }
+        },
     },
     Mutation: {
         createUser: async (_, { name, email, password, role }, { db }) => {
