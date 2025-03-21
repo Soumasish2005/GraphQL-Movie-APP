@@ -44,6 +44,11 @@ export const typeDefs = gql`
     input MovieInput {
         name: String
         isInTheatres: Boolean
+        description: String
+        thumbnail: String
+        downloadLinks: [String]
+        watchLinks: [String]
+        comments: [String]
         directors: [String]
         releaseYear: Int
         genre: [String]
@@ -78,5 +83,6 @@ export const typeDefs = gql`
         addMovie(input: MovieInput): Movie
         updateMovie(input: MovieInput): Movie
         deleteMovie(id: ID!): Movie
+        addMovies(inputs: [MovieInput]): [Movie]
     }
 `;

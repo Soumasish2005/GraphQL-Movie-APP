@@ -121,6 +121,21 @@ export const resolvers = {
             const res = await writeToDB(query, values);
             console.log(res)
             return res;
+        },
+        addMovies: async (_, { inputs }) => {
+            const query = `
+                INSERT INTO movies ("name", "directors", "releaseYear", "genre", "rating", "isInTheatres", "studio", "runtime", "description", "thumbnail", "downloadLinks", "watchLinks")
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                RETURNING *;
+            `;
+            const addedMovies = [];
+            for (const input of inputs) {
+                const { name, directors, releaseYear, genre, rating, isInTheatres, studio, runtime, description, thubnail, downloadLinks, watchLinks } = input;
+                const values = [name, directors, releaseYear, genre, rating, isInTheatres, studio, runtime, description,  thubnail, downloadLinks, watchLinks];
+                const res = await writeToDB(query, values);
+                addedMovies.push(res);
+            }
+            return addedMovies;
         }
     }
 };
