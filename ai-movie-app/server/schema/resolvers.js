@@ -7,7 +7,6 @@ export const resolvers = {
             try {
                 console.log('Fetching all movies from the database...');
                 const res = await db.query('SELECT * FROM movies');
-                console.log('Movies fetched successfully:', res.rows);
                 return res.rows;
             } catch (err) {
                 console.error('Error fetching movies:', err);
@@ -25,17 +24,54 @@ export const resolvers = {
                 throw new Error('Error fetching users');
             }
         },
-        filterMoviesByInput: (_, { filter }) => {
-            return movies.filter(movie => 
-                (!filter.name || movie.name.toLowerCase().includes(filter.name.toLowerCase())) &&
-                (!filter.director || movie.director.toLowerCase().includes(filter.director.toLowerCase())) &&
-                (!filter.releaseYear || movie.releaseYear === filter.releaseYear) &&
-                (!filter.genre || filter.genre.every(g => movie.genre.includes(g))) &&
-                (!filter.rating || movie.rating >= filter.rating) &&
-                (!filter.studio || movie.studio.toLowerCase().includes(filter.studio.toLowerCase())) &&
-                (!filter.runtime || movie.runtime >= filter.runtime)
-            );
-        }
+        filterMoviesByInput: async (_, { filter }, { db }) => {
+            try {
+                const conditions = [];
+                const values = [];
+                let index = 1;
+
+                const filterMapping = {
+                    name: (value) => [`LOWER(name) LIKE LOWER($${index++})`, `%${value}%`],
+                    directors: (value) => [`$${index++} = ANY(directors)`, value],
+                    releaseYear: (value) => [`"releaseYear" = $${index++}`, value],
+                    genre: (value) => [`$${index++} = ANY(genre)`, value],
+                    rating: (value) => [`rating >= $${index++}`, value],
+                    studio: (value) => [`LOWER(studio) LIKE LOWER($${index++})`, `%${value}%`],
+                    runtime: (value) => [`runtime >= $${index++}`, value]
+                };
+
+                Object.entries(filter).forEach(([key, value]) => {
+                    if (filterMapping[key]) {
+                        const [condition, val] = filterMapping[key](value);
+                        conditions.push(condition);
+                        values.push(val);
+                    }
+                });
+
+                const query = `
+                    SELECT * FROM movies
+                    ${conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''}
+                `;
+                const res = await db.query(query, values);
+                return res.rows;
+            } catch (err) {
+                console.error('Error filtering movies:', err);
+                throw new Error('Error filtering movies');
+            }
+        },
+        getCommentsByMovieId: async (_, { movieId }, { db }) => {
+            try {
+                console.log(`Fetching comments for movie ID ${movieId} from the database...`);
+                const query = 'SELECT * FROM comments WHERE "movieId" = $1';
+                const values = [movieId];
+                const res = await db.query(query, values);
+                console.log('Comments fetched successfully:', res.rows);
+                return res.rows;
+            } catch (err) {
+                console.error('Error fetching comments:', err);
+                throw new Error('Error fetching comments');
+            }
+        },
     },
     Mutation: {
         createUser: async (_, { name, email, password, role }, { db }) => {

@@ -24,6 +24,8 @@ export const typeDefs = gql`
         text: String
         createdAt: String
         updatedAt: String
+        movieId: ID!
+        userId: ID!
     }
     type Movie{
         id: ID!
@@ -65,6 +67,7 @@ export const typeDefs = gql`
 
         getAllMovies: [Movie!]!
         getMovieById(id: ID!): Movie
+        getCommentsByMovieId(movieId: ID!): [Comment]
         filterMoviesByInput(filter: MovieInput): [Movie]
     }
     type Mutation {
