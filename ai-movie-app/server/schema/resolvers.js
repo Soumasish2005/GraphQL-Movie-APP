@@ -38,91 +38,49 @@ export const resolvers = {
         }
     },
     Mutation: {
-        createUser: async (_, { name, email, password, role }) => {
-            // const newUser = {
-            //     id: String(users.length + 1),
-            //     name,
-            //     email,
-            //     password,
-            //     role: role || 'REGULAR',
-            //     createdAt: new Date().toISOString(),
-            //     updatedAt: new Date().toISOString(),
-            //     movies: []
-            // };
-            // users.unshift(newUser);
+        createUser: async (_, { name, email, password, role }, { db }) => {
             const query = `
                 INSERT INTO users ("name", "email", "password", "role", "createdAt", "updatedAt")
                 VALUES ($1, $2, $3, $4, $5, $6)
                 RETURNING *;
             `;
             const values = [name, email, password, role || 'REGULAR', new Date().toISOString(), new Date().toISOString()];
-            await writeToDB(query, values);
+            const newUser = await writeToDB(db, query, values);
             return newUser;
         },
-        updateUser: async (_, { id, name, email, password }) => {
-            // const userIndex = users.findIndex(user => user.id === id);
-            // if (userIndex === -1) {
-            //     throw new Error('User not found');
-            // }
-            // const updatedUser = {
-            //     ...users[userIndex],
-            //     name: name || users[userIndex].name,
-            //     email: email || users[userIndex].email,
-            //     password: password || users[userIndex].password,
-            //     updatedAt: new Date().toISOString()
-            // };
-            // users[userIndex] = updatedUser;
+        updateUser: async (_, { id, name, email, password }, { db }) => {
             const query = `
                 UPDATE users
                 SET name = $1, email = $2, password = $3, updatedAt = $4
                 WHERE id = $5
                 RETURNING *;
             `;
-            const values = [name || users[userIndex].name, email || users[userIndex].email, password || users[userIndex].password, new Date().toISOString(), id];
-            await writeToDB(query, values);
+            const values = [name, email, password, new Date().toISOString(), id];
+            const updatedUser = await writeToDB(db, query, values);
             return updatedUser;
         },
-        deleteUser: async (_, { id }) => {
-            // const userIndex = users.findIndex(user => user.id === id);
-            // if (userIndex === -1) {
-            //     throw new Error('User not found');
-            // }
-            // const deletedUser = users[userIndex];
-            // users.splice(userIndex, 1);
+        deleteUser: async (_, { id }, { db }) => {
             const query = `
                 DELETE FROM users
                 WHERE id = $1
                 RETURNING *;
             `;
             const values = [id];
-            await writeToDB(query, values);
+            const deletedUser = await writeToDB(db, query, values);
             return deletedUser;
         },
-        addMovie: async (_, { input }) => {
+        addMovie: async (_, { input }, { db }) => {
             const { name, directors, releaseYear, genre, rating, isInTheatres, studio, runtime } = input;
-            // const newMovie = {
-            //     id: String(movies.length + 1),
-            //     name,
-            //     director,
-            //     releaseYear,
-            //     genre,
-            //     rating,
-            //     isInTheatres,
-            //     studio,
-            //     runtime
-            // };
-            // movies.unshift(newMovie);
             const query = `
                 INSERT INTO movies ("name", "directors", "releaseYear", "genre", "rating", "isInTheatres", "studio", "runtime")
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                 RETURNING *;
             `;
             const values = [name, directors, releaseYear, genre, rating, isInTheatres, studio, runtime];
-            const res = await writeToDB(query, values);
-            console.log(res)
-            return res;
+            const newMovie = await writeToDB(db, query, values);
+            return newMovie;
         },
-        addMovies: async (_, { inputs }) => {
+        addMovies: async (_, { inputs }, { db }) => {
             const query = `
                 INSERT INTO movies ("name", "directors", "releaseYear", "genre", "rating", "isInTheatres", "studio", "runtime", "description", "thumbnail", "downloadLinks", "watchLinks")
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
@@ -130,10 +88,10 @@ export const resolvers = {
             `;
             const addedMovies = [];
             for (const input of inputs) {
-                const { name, directors, releaseYear, genre, rating, isInTheatres, studio, runtime, description, thubnail, downloadLinks, watchLinks } = input;
-                const values = [name, directors, releaseYear, genre, rating, isInTheatres, studio, runtime, description,  thubnail, downloadLinks, watchLinks];
-                const res = await writeToDB(query, values);
-                addedMovies.push(res);
+                const { name, directors, releaseYear, genre, rating, isInTheatres, studio, runtime, description, thumbnail, downloadLinks, watchLinks } = input;
+                const values = [name, directors, releaseYear, genre, rating, isInTheatres, studio, runtime, description, thumbnail, downloadLinks, watchLinks];
+                const newMovie = await writeToDB(db, query, values);
+                addedMovies.push(newMovie);
             }
             return addedMovies;
         }

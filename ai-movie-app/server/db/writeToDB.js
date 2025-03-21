@@ -1,7 +1,6 @@
 import connectDB from './connection.js';
 
-const writeToDB = async (query, values) => {
-  const client = await connectDB();
+const writeToDB = async (client, query, values) => {
   try {
     await client.query('BEGIN');
     const res = await client.query(query, values);
@@ -10,8 +9,6 @@ const writeToDB = async (query, values) => {
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;
-  } finally {
-    client.end();
   }
 };
 
