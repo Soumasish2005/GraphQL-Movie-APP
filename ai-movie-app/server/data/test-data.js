@@ -106,4 +106,63 @@ const users = [
     { id: "2", name: "Jane Doe", email: "jane.doe@example.com", password: "password123", role: "regular", createdAt: "2023-01-01T00:00:00Z", updatedAt: "2023-01-01T00:00:00Z", movies: [movies[2], movies[3], movies[94]] }
 ]
 
+const newMovie = {
+    "id": "101",
+    "name": "Inception",
+    "isInTheatres": false,
+    "releaseYear": 2010,
+    "genre": ["SciFi", "Thriller"],
+    "rating": 8.8,
+    "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+    "directors": ["Christopher Nolan"],
+    "studio": "Warner Bros.",
+    "runtime": 148,
+    "thumbnail": "inception.jpg",
+    "downloadLinks": ["link1"],
+    "watchLinks": ["link2"]
+};
+
+const newUser = {
+    "id": "3",
+    "name": "Alice Smith",
+    "email": "alice.smith@example.com",
+    "password": "securepassword",
+    "role": "regular",
+    "movies": [newMovie]
+};
+
+const comments = [
+    {
+        "id": "1",
+        "userId": "2",
+        "movieId": "7",
+        "text": "Amazing movie with a mind-bending plot!",
+        "createdAt": "2023-01-01T00:00:00Z",
+        "updatedAt": "2023-01-01T00:00:00Z",
+        "replies": []
+    },
+    {
+        "id": "2",
+        "userId": "3",
+        "movieId": "101",
+        "text": "The visuals and soundtrack are stunning.",
+        "createdAt": "2023-01-02T00:00:00Z",
+        "updatedAt": "2023-01-02T00:00:00Z",
+        "replies": []
+    },
+    {
+        "id": "3",
+        "userId": "3",
+        "movieId": "101",
+        "text": "A must-watch for sci-fi fans.",
+        "createdAt": "2023-01-03T00:00:00Z",
+        "updatedAt": "2023-01-03T00:00:00Z",
+        "replies": []
+    }
+];
+
+newMovie.comments = comments;
+
+users.push(newUser);
+movies.push(newMovie);
 export { movies, users };

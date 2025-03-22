@@ -65,8 +65,20 @@ export const resolvers = {
                 const query = 'SELECT * FROM comments WHERE "movieId" = $1';
                 const values = [movieId];
                 const res = await db.query(query, values);
-                console.log('Comments fetched successfully:', res.rows);
-                return res.rows;
+                const comments = res.rows;
+                for (const comment of comments) {
+                    if (comment.replies && comment.replies.length > 0) {
+                        const repliesQuery = 'SELECT * FROM comments WHERE id = ANY($1)';
+                        const repliesValues = [comment.replies];
+                        const repliesRes = await db.query(repliesQuery, repliesValues);
+                        comment.replies = repliesRes.rows;
+                    }
+                    const userQuery = 'SELECT * FROM users WHERE id = $1';
+                    const userValues = [comment.userId];
+                    const userRes = await db.query(userQuery, userValues);
+                    comment.user = userRes.rows[0];
+                }
+                return comments;
             } catch (err) {
                 console.error('Error fetching comments:', err);
                 throw new Error('Error fetching comments');
@@ -130,6 +142,88 @@ export const resolvers = {
                 addedMovies.push(newMovie);
             }
             return addedMovies;
+        },
+        addComment: async (_, { userId, movieId, text }, { db }) => {
+            const query = `
+                INSERT INTO comments ("userId", "movieId", text, "createdAt", "updatedAt")
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING *;
+            `;
+            const values = [userId, movieId, text, new Date().toISOString(), new Date().toISOString()];
+            const newComment = await writeToDB(db, query, values);
+            return newComment;
+        },
+        updateComment: async (_, { id, text }, { db }) => {
+            const query = `
+                UPDATE comments
+                SET text = $1, "updatedAt" = $2
+                WHERE id = $3
+                RETURNING *;
+            `;
+            const values = [text, new Date().toISOString(), id];
+            const updatedComment = await writeToDB(db, query, values);
+            return updatedComment;
+        },
+        addReplyToComment: async (_, { userId, commentId, text }, { db }) => {
+            const query = `
+                INSERT INTO comments ("userId", "movieId", text, "createdAt", "updatedAt")
+                VALUES ($1, (SELECT "movieId" FROM comments WHERE id = $2), $3, $4, $5)
+                RETURNING *;
+            `;
+            const values = [userId, commentId, text, new Date().toISOString(), new Date().toISOString()];
+            const newReply = await writeToDB(db, query, values);
+
+            const updateQuery = `
+                UPDATE comments
+                SET replies = array_append(replies, $1)
+                WHERE id = $2
+                RETURNING *;
+            `;
+            const updateValues = [newReply.id, commentId];
+            await writeToDB(db, updateQuery, updateValues);
+
+            return newReply;
+        },
+        updateReplyToComment: async (_, { id, text }, { db }) => {
+            const query = `
+                UPDATE comments
+                SET text = $1, "updatedAt" = $2
+                WHERE id = $3
+                RETURNING *;
+            `;
+            const values = [text, new Date().toISOString(), id];
+            const updatedReply = await writeToDB(db, query, values);
+            return updatedReply;
+        },
+        deleteComment: async (_, { id }, { db }) => {
+            const query = `
+                DELETE FROM comments
+                WHERE id = $1
+                RETURNING *;
+            `;
+            const values = [id];
+            const deletedComment = await writeToDB(db, query, values);
+            return deletedComment;
+        },
+        deleteReplyToComment: async (_, { id }, { db }) => {
+            const query = `
+                DELETE FROM comments
+                WHERE id = $1
+                RETURNING *;
+            `;
+            const values = [id];
+            const deletedReply = await writeToDB(db, query, values);
+
+            const updateQuery = `
+                UPDATE comments
+                SET replies = array_remove(replies, $1)
+                WHERE $1 = ANY(replies)
+                RETURNING *;
+            `;
+            const updateValues = [id];
+            await writeToDB(db, updateQuery, updateValues);
+
+            return deletedReply;
         }
     }
 };
