@@ -26,6 +26,7 @@ export const typeDefs = gql`
         userId: ID!
         movieId: ID!
         replies: [Comment]
+        parentId: ID
     }
     type Movie{
         id: ID!

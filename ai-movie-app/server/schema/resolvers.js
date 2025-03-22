@@ -62,16 +62,32 @@ export const resolvers = {
         getCommentsByMovieId: async (_, { movieId }, { db }) => {
             try {
                 console.log(`Fetching comments for movie ID ${movieId} from the database...`);
-                const query = 'SELECT * FROM comments WHERE "movieId" = $1';
+                const query = 'SELECT * FROM comments WHERE "movieId" = $1 AND "parentId" IS NULL';
                 const values = [movieId];
                 const res = await db.query(query, values);
                 const comments = res.rows;
                 for (const comment of comments) {
-                    if (comment.replies && comment.replies.length > 0) {
-                        const repliesQuery = 'SELECT * FROM comments WHERE id = ANY($1)';
-                        const repliesValues = [comment.replies];
-                        const repliesRes = await db.query(repliesQuery, repliesValues);
-                        comment.replies = repliesRes.rows;
+                    const repliesQuery = 'SELECT * FROM comments WHERE "parentId" = $1';
+                    const repliesValues = [comment.id];
+                    const repliesRes = await db.query(repliesQuery, repliesValues);
+                    comment.replies = repliesRes.rows;
+                    for (const reply of comment.replies) {
+                        const userQuery = 'SELECT * FROM users WHERE id = $1';
+                        const userValues = [reply.userId];
+                        const userRes = await db.query(userQuery, userValues);
+                        reply.user = userRes.rows[0];
+
+                        // Fetch user data for replies to replies
+                        const subRepliesQuery = 'SELECT * FROM comments WHERE "parentId" = $1';
+                        const subRepliesValues = [reply.id];
+                        const subRepliesRes = await db.query(subRepliesQuery, subRepliesValues);
+                        reply.replies = subRepliesRes.rows;
+                        for (const subReply of reply.replies) {
+                            const subUserQuery = 'SELECT * FROM users WHERE id = $1';
+                            const subUserValues = [subReply.userId];
+                            const subUserRes = await db.query(subUserQuery, subUserValues);
+                            subReply.user = subUserRes.rows[0];
+                        }
                     }
                     const userQuery = 'SELECT * FROM users WHERE id = $1';
                     const userValues = [comment.userId];
@@ -166,22 +182,12 @@ export const resolvers = {
         },
         addReplyToComment: async (_, { userId, commentId, text }, { db }) => {
             const query = `
-                INSERT INTO comments ("userId", "movieId", text, "createdAt", "updatedAt")
-                VALUES ($1, (SELECT "movieId" FROM comments WHERE id = $2), $3, $4, $5)
+                INSERT INTO comments ("userId", "movieId", text, "createdAt", "updatedAt", "parentId")
+                VALUES ($1, (SELECT "movieId" FROM comments WHERE id = $2), $3, $4, $5, $2)
                 RETURNING *;
             `;
             const values = [userId, commentId, text, new Date().toISOString(), new Date().toISOString()];
             const newReply = await writeToDB(db, query, values);
-
-            const updateQuery = `
-                UPDATE comments
-                SET replies = array_append(replies, $1)
-                WHERE id = $2
-                RETURNING *;
-            `;
-            const updateValues = [newReply.id, commentId];
-            await writeToDB(db, updateQuery, updateValues);
-
             return newReply;
         },
         updateReplyToComment: async (_, { id, text }, { db }) => {
@@ -213,16 +219,6 @@ export const resolvers = {
             `;
             const values = [id];
             const deletedReply = await writeToDB(db, query, values);
-
-            const updateQuery = `
-                UPDATE comments
-                SET replies = array_remove(replies, $1)
-                WHERE $1 = ANY(replies)
-                RETURNING *;
-            `;
-            const updateValues = [id];
-            await writeToDB(db, updateQuery, updateValues);
-
             return deletedReply;
         }
     }

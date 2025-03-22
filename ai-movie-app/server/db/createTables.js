@@ -57,7 +57,7 @@ const createTables = async () => {
         text TEXT,
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        replies JSONB DEFAULT '[]'
+        "parentId" INT REFERENCES comments(id) ON DELETE CASCADE
       );
     `);
 
