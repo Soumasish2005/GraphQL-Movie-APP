@@ -20,12 +20,12 @@ export const typeDefs = gql`
     type Comment{
         id: ID!
         user: User
-        movie: Movie
         text: String
         createdAt: String
         updatedAt: String
-        movieId: ID!
         userId: ID!
+        movieId: ID!
+        replies: [Comment]
     }
     type Movie{
         id: ID!
@@ -35,7 +35,6 @@ export const typeDefs = gql`
         directors: [String]
         releaseYear: Int
         genre: [String]
-        comments: [Comment]
         rating: Float
         studio: String
         runtime: Int
@@ -87,5 +86,12 @@ export const typeDefs = gql`
         updateMovie(input: MovieInput): Movie
         deleteMovie(id: ID!): Movie
         addMovies(inputs: [MovieInput]): [Movie]
+
+        addComment(userId: ID!, movieId: ID!, text: String): Comment
+        updateComment(id: ID!, text: String): Comment
+        addReplyToComment(userId: ID!, commentId: ID!, text: String): Comment
+        updateReplyToComment(id: ID!, text: String): Comment
+        deleteComment(id: ID!): Comment
+        deleteReplyToComment(id: ID!): Comment
     }
 `;
