@@ -6,14 +6,14 @@ export const typeDefs = gql`
         name: String!
         email: String!
         password: String!
-        role: String
+        role: Role
         createdAt: String
         updatedAt: String
         watchedMovies: [Movie]
         downloadedMovies: [Movie]
         watchList: [Movie]
     }
-    enum role{
+    enum Role{
         REGULAR
         ADMIN
     }

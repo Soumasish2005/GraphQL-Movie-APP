@@ -5,8 +5,7 @@ This is a GraphQL-based Movie Application that allows users to manage and query 
 ## Features
 
 - User management (create, update, delete users)
-- Movie management (query movies, filter movies by rating)
-- Anime movie management (query anime movies, filter anime movies by various criteria)
+- Movie management (query movies, filter movies by various criteria)
 - Secure database connection using SSL
 
 ## Project Structure
@@ -14,12 +13,24 @@ This is a GraphQL-based Movie Application that allows users to manage and query 
 ```
 .
 ├── client
-│   └── .gitignore
+│   ├── .gitignore
+│   ├── index.html
+│   ├── package.json
+│   ├── eslint.config.js
+│   ├── README.md
+│   ├── src
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
+│   └── vite.config.js
 ├── server
 │   ├── db
 │   │   ├── certs
 │   │   │   └── ca.pem
-│   │   └── connection.js
+│   │   ├── connection.js
+│   │   ├── createTables.js
+│   │   └── writeToDB.js
 │   ├── data
 │   │   └── test-data.js
 │   ├── schema
@@ -43,7 +54,7 @@ This is a GraphQL-based Movie Application that allows users to manage and query 
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/your-username/ai-movie-app.git
+    git clone https://github.com/Soumasish2005/ai-movie-app.git
     cd ai-movie-app
     ```
 
@@ -53,7 +64,13 @@ This is a GraphQL-based Movie Application that allows users to manage and query 
     npm install
     ```
 
-3. Set up environment variables:
+3. Install client dependencies:
+    ```sh
+    cd ../client
+    npm install
+    ```
+
+4. Set up environment variables:
     Create a `.env` file in the `server` directory and add the following:
     ```
     PORT=4000
@@ -65,8 +82,15 @@ This is a GraphQL-based Movie Application that allows users to manage and query 
     DB_SSL_CA_PATH=../db/certs/ca.pem
     ```
 
-4. Start the server:
+5. Start the server:
     ```sh
+    cd ../server
+    npm run dev
+    ```
+
+6. Start the client:
+    ```sh
+    cd ../client
     npm run dev
     ```
 
@@ -78,6 +102,7 @@ This is a GraphQL-based Movie Application that allows users to manage and query 
 ## Available Scripts
 
 - `npm run dev`: Start the server in development mode
+- `npm run dev`: Start the client in development mode
 
 ## Technologies Used
 
@@ -89,6 +114,8 @@ This is a GraphQL-based Movie Application that allows users to manage and query 
 - dotenv
 - cors
 - body-parser
+- React
+- Vite
 
 ## License
 
