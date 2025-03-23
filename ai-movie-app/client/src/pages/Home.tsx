@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_ALL_MOVIES } from '../graphql/queries';
+import { MovieCard } from '../components/MovieCard';
 
 const Home = () => {
   const { loading, error, data } = useQuery(GET_ALL_MOVIES);
+  console.log(data);
 
   useEffect(() => {
     if (error) {
@@ -12,14 +14,14 @@ const Home = () => {
   }, [error]);
 
   if (loading) return <p>Loading...</p>;
+  if (!data || !data.getAllMovies) return <p>No movies found.</p>;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {data.getAllMovies.map((movie) => (
         <div key={movie.id} className="bg-gray-800 p-4 rounded-lg">
-          <img src={movie.thumbnail} alt={movie.name} className="w-full h-48 object-cover rounded-lg" />
-          <h2 className="text-xl font-bold mt-2">{movie.name}</h2>
-          <p className="text-gray-400">{movie.description}</p>
+          
+          <MovieCard id={movie.id} name={movie.name} rating={movie.rating} year={movie.releaseYear} thumbnail={movie.thumbnail} description={movie.description} />
         </div>
       ))}
     </div>

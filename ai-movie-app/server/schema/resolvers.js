@@ -118,6 +118,22 @@ export const resolvers = {
                 throw new Error('Error fetching comments');
             }
         },
+        getMovieById: async (_, { id }, { db }) => {
+            try {
+                console.log(`Fetching movie with ID ${id} from the database...`);
+                const query = 'SELECT * FROM movies WHERE id = $1';
+                const values = [id];
+                const res = await db.query(query, values);
+                const movie = res.rows[0];
+                if (!movie) {
+                    throw new Error('No movie found with this ID');
+                }
+                return movie;
+            } catch (err) {
+                console.error('Error fetching movie:', err);
+                throw new Error('Error fetching movie');
+            }
+        },
     },
     Mutation: {
         createUser: async (_, { name, email, password, role }, { db }) => {

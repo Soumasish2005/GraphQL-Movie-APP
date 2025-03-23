@@ -5,22 +5,22 @@ import { Star, Clock, Calendar, Heart } from 'lucide-react';
 
 const GET_MOVIE_DETAIL = gql`
   query GetMovieDetail($id: ID!) {
-    movie(id: $id) {
+    getMovieById(id: $id) {
       id
-      title
-      overview
-      posterUrl
+      name
+      description
+      thumbnail
       rating
       releaseYear
       runtime
-      genres
+      genre
     }
   }
 `;
 
 const GET_MOVIE_COMMENTS = gql`
   query GetMovieComments($movieId: ID!) {
-    comments(movieId: $movieId) {
+    getCommentsByMovieId(movieId: $movieId) {
       id
       text
       user {
@@ -63,21 +63,29 @@ const MovieDetail = () => {
     );
   }
 
-  const movie = movieData?.movie;
-  const comments = commentsData?.comments;
+  const movie = movieData?.getMovieById;
+  const comments = commentsData?.getCommentsByMovieId;
+
+  if (!movie) {
+    return (
+      <div className="text-center text-red-500 mt-8">
+        Error loading movie details.
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-1/3">
           <img
-            src={movie.posterUrl}
-            alt={movie.title}
+            src={movie.thumbnail}
+            alt={movie.name}
             className="w-full rounded-lg shadow-lg"
           />
         </div>
         <div className="w-full md:w-2/3">
-          <h1 className="text-4xl font-bold text-white mb-4">{movie.title}</h1>
+          <h1 className="text-4xl font-bold text-white mb-4">{movie.name}</h1>
           
           <div className="flex flex-wrap gap-4 mb-6">
             <div className="flex items-center text-yellow-400">
@@ -95,7 +103,7 @@ const MovieDetail = () => {
           </div>
 
           <div className="flex flex-wrap gap-2 mb-6">
-            {movie.genres.map((genre: string) => (
+            {movie.genre.map((genre: string) => (
               <span
                 key={genre}
                 className="px-3 py-1 bg-gray-800 text-gray-300 rounded-full text-sm"
@@ -105,7 +113,7 @@ const MovieDetail = () => {
             ))}
           </div>
 
-          <p className="text-gray-300 mb-6">{movie.overview}</p>
+          <p className="text-gray-300 mb-6">{movie.description}</p>
 
           <button className="flex items-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
             <Heart className="h-5 w-5" />
