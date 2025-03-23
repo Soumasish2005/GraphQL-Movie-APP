@@ -8,6 +8,8 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const caCertBase64 = process.env.DB_CA_CERT;
+const caCertBuffer = Buffer.from(caCertBase64, 'base64');
 const config = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -16,7 +18,7 @@ const config = {
     database: process.env.DB_NAME,
     ssl: {
         rejectUnauthorized: true,
-        ca: fs.readFileSync(path.resolve(__dirname, process.env.DB_SSL_CA_PATH)).toString(),
+        ca: caCertBuffer.toString() || fs.readFileSync(path.resolve(__dirname, process.env.DB_SSL_CA_PATH)).toString(),
     },
 };
 

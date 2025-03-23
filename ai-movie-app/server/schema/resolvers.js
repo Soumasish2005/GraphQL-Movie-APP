@@ -1,5 +1,7 @@
 import { movies, users } from '../data/test-data.js';
 import writeToDB from '../db/writeToDB.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export const resolvers = {
     Query: {
@@ -22,6 +24,22 @@ export const resolvers = {
             } catch (err) {
                 console.error('Error fetching users:', err);
                 throw new Error('Error fetching users');
+            }
+        },
+        getUserById: async (_, { id }, { db }) => {
+            try {
+                console.log(`Fetching user with ID ${id} from the database...`);
+                const query = 'SELECT * FROM users WHERE id = $1';
+                const values = [id];
+                const res = await db.query(query, values);
+                const user = res.rows[0];
+                if (!user) {
+                    throw new Error('No user found with this ID');
+                }
+                return user;
+            } catch (err) {
+                console.error('Error fetching user:', err);
+                throw new Error('Error fetching user');
             }
         },
         filterMoviesByInput: async (_, { filter }, { db }) => {
@@ -103,23 +121,25 @@ export const resolvers = {
     },
     Mutation: {
         createUser: async (_, { name, email, password, role }, { db }) => {
+            const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
             const query = `
                 INSERT INTO users ("name", "email", "password", "role", "createdAt", "updatedAt")
                 VALUES ($1, $2, $3, $4, $5, $6)
                 RETURNING *;
             `;
-            const values = [name, email, password, role || 'REGULAR', new Date().toISOString(), new Date().toISOString()];
+            const values = [name, email, hashedPassword, role || 'REGULAR', new Date().toISOString(), new Date().toISOString()];
             const newUser = await writeToDB(db, query, values);
             return newUser;
         },
         updateUser: async (_, { id, name, email, password }, { db }) => {
+            const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
             const query = `
                 UPDATE users
                 SET name = $1, email = $2, password = $3, updatedAt = $4
                 WHERE id = $5
                 RETURNING *;
             `;
-            const values = [name, email, password, new Date().toISOString(), id];
+            const values = [name, email, hashedPassword, new Date().toISOString(), id];
             const updatedUser = await writeToDB(db, query, values);
             return updatedUser;
         },
@@ -220,6 +240,29 @@ export const resolvers = {
             const values = [id];
             const deletedReply = await writeToDB(db, query, values);
             return deletedReply;
+        },
+        login: async (_, { email, password }, { db }) => {
+            const query = 'SELECT * FROM users WHERE email = $1';
+            const values = [email];
+            const res = await db.query(query, values);
+            const user = res.rows[0];
+
+            if (!user) {
+                throw new Error('No user found with this email');
+            }
+
+            const valid = await bcrypt.compare(password, user.password); // Compare plain password with hashed password
+            if (!valid) {
+                throw new Error('Invalid password');
+            }
+
+            // Generate JWT
+            const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+            return {
+                token,
+                user,
+            };
         }
     }
 };

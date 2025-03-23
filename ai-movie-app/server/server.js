@@ -9,7 +9,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config(); // Ensure dotenv is configured
 
 const startServer = async () => {
   // Connecting to the database
