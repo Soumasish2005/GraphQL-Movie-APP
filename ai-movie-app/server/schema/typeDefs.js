@@ -83,7 +83,7 @@ export const typeDefs = gql`
         removeFromDownloadedMovies(userId: ID!, movieId: ID!): User
 
         addMovie(input: MovieInput): Movie
-        updateMovie(input: MovieInput): Movie
+        updateMovie(id: ID!, input: MovieInput): Movie
         deleteMovie(id: ID!): Movie
         addMovies(inputs: [MovieInput]): [Movie]
 

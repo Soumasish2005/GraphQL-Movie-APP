@@ -279,6 +279,28 @@ export const resolvers = {
                 token,
                 user,
             };
+        },
+        updateMovie: async (_, { id, input }, { db }) => {
+            const fields = [];
+            const values = [];
+            let index = 1;
+
+            for (const [key, value] of Object.entries(input)) {
+                fields.push(`"${key}" = $${index++}`);
+                values.push(value);
+            }
+
+            values.push(id); // Add the movie ID as the last value
+
+            const query = `
+                UPDATE movies
+                SET ${fields.join(', ')}
+                WHERE id = $${index}
+                RETURNING *;
+            `;
+
+            const updatedMovie = await writeToDB(db, query, values);
+            return updatedMovie;
         }
     }
 };
