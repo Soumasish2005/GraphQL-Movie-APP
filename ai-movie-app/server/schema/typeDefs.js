@@ -6,6 +6,7 @@ export const typeDefs = gql`
         name: String!
         email: String!
         password: String!
+        avatar: String
         role: Role
         createdAt: String
         updatedAt: String
@@ -21,6 +22,8 @@ export const typeDefs = gql`
         id: ID!
         user: User
         text: String
+        likes: Int
+        dislikes: Int
         createdAt: String
         updatedAt: String
         userId: ID!
@@ -30,18 +33,21 @@ export const typeDefs = gql`
     }
     type Movie {
         id: ID!
-        name: String!
+        title: String!
         description: String
         isInTheatres: Boolean
         directors: [String]
+        actors: [String]
+        languages: [String]
         releaseYear: Int
-        genre: [String]
+        genres: [String]
         rating: Float
         studio: String
         runtime: Int
         thumbnail: String
         downloadLinks: [String]
         watchLinks: [String]
+        trailer: String
     }
     input MovieInput {
         name: String

@@ -4,12 +4,12 @@ export const GET_ALL_MOVIES = gql`
   query GetAllMovies {
     getAllMovies {
       id
-      name
+      title
       description
       isInTheatres
       directors
       releaseYear
-      genre
+      genres
       rating
       studio
       runtime
@@ -24,12 +24,12 @@ export const GET_MOVIE_DETAIL = gql`
   query GetMovieDetail($id: ID!) {
     getMovieById(id: $id) {
       id
-      name
+      title
       description
       isInTheatres
       directors
       releaseYear
-      genre
+      genres
       rating
       studio
       runtime
