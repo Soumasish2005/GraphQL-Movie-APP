@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import { Star, Clock, Calendar, Heart, Film, MessageCircle, Loader2, Share2 } from 'lucide-react';
-import { GET_MOVIE_DETAIL, GET_MOVIE_COMMENTS } from '../graphql/queries';
+import { GET_MOVIE_DETAIL, GET_MOVIE_COMMENTS, GET_USER_WATCHLIST } from '../graphql/queries';
+import { ADD_TO_WATCHLIST } from '../graphql/mutations';
 
 const MovieDetail = () => {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(true);
-  
+  const [isAddingToWatchlist, setIsAddingToWatchlist] = useState(false);
+
   const { loading: movieLoading, error: movieError, data: movieData } = useQuery(GET_MOVIE_DETAIL, {
     variables: { id },
   });
@@ -15,7 +17,38 @@ const MovieDetail = () => {
   const { loading: commentsLoading, error: commentsError, data: commentsData } = useQuery(GET_MOVIE_COMMENTS, {
     variables: { movieId: id },
   });
-
+  const [addToWatchList] = useMutation(ADD_TO_WATCHLIST, {
+    update: (cache, { data: { addToWatchList } }) => {
+      const userId = localStorage.getItem('userId');
+      if (!userId) return;
+  
+      // Read the existing watchlist from the cache
+      const existingData: any = cache.readQuery({
+        query: GET_USER_WATCHLIST,
+        variables: { userId },
+      });
+  
+      // Update the watchlist with the new movie
+      if (existingData) {
+        cache.writeQuery({
+          query: GET_USER_WATCHLIST,
+          variables: { userId },
+          data: {
+            getUserWatchList: [...existingData.getUserWatchList, addToWatchList],
+          },
+        });
+      }
+    },
+    onCompleted: () => {
+      setIsAddingToWatchlist(false);
+      alert('Movie added to watchlist!');
+    },
+    onError: (error) => {
+      setIsAddingToWatchlist(false);
+      console.error('Error adding to watchlist:', error);
+      alert('Failed to add movie to watchlist.');
+    },
+  });
   useEffect(() => {
     if (!movieLoading && !commentsLoading) {
       const timer = setTimeout(() => setIsLoading(false), 300);
@@ -55,7 +88,23 @@ const MovieDetail = () => {
       </div>
     );
   }
-
+  const handleAddToWatchlist = () => {
+    setIsAddingToWatchlist(true);
+    const userId = localStorage.getItem('userId'); // Assuming user ID is stored in localStorage
+    if (!userId) {
+      alert('You must be logged in to add movies to your watchlist.');
+      setIsAddingToWatchlist(false);
+      return;
+    }
+    console.log(movie.id);
+    console.log(userId);
+    addToWatchList({
+      variables: {
+        userId,
+        movieId: movie.id.toString(),
+      },
+    });
+  };
   return (
     <div className="min-h-screen pt-12">
       {/* Hero Section */}
@@ -74,7 +123,7 @@ const MovieDetail = () => {
             <div className="card overflow-hidden">
               <img
                 src={movie.thumbnail}
-                alt={movie.name}
+                alt={movie.title}
                 className="w-full h-auto rounded-2xl"
               />
             </div>
@@ -83,7 +132,7 @@ const MovieDetail = () => {
           {/* Movie Details */}
           <div className="lg:w-2/3">
             <div className="card p-8">
-              <h1 className="text-4xl font-bold mb-4">{movie.name}</h1>
+              <h1 className="text-4xl font-bold mb-4">{movie.title}</h1>
               
               <div className="flex flex-wrap gap-4 mb-6">
                 <div className="flex items-center text-yellow-400">
@@ -101,12 +150,12 @@ const MovieDetail = () => {
               </div>
 
               <div className="flex flex-wrap gap-2 mb-6">
-                {movie.genre && movie.genre.map((g: string) => (
+                {movie.genres && movie.genres.map((genre: string) => (
                   <span
-                    key={g}
+                    key={genre}
                     className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm font-medium"
                   >
-                    {g}
+                    {genre}
                   </span>
                 ))}
               </div>
@@ -116,9 +165,13 @@ const MovieDetail = () => {
               </p>
 
               <div className="flex flex-wrap gap-4">
-                <button className="btn-primary flex items-center gap-2">
+              <button
+                  className="btn-primary flex items-center gap-2"
+                  onClick={handleAddToWatchlist}
+                  disabled={isAddingToWatchlist}
+                >
                   <Heart className="h-5 w-5" />
-                  Add to Watchlist
+                  {isAddingToWatchlist ? 'Adding...' : 'Add to Watchlist'}
                 </button>
                 <button className="btn-secondary flex items-center gap-2">
                   <Share2 className="h-5 w-5" />

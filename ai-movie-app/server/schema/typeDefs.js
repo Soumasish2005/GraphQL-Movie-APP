@@ -66,7 +66,7 @@ export const typeDefs = gql`
     }
     type Query {
         getAllUsers: [User!]!
-        getUserWatchList(id: ID!): [Movie]
+        getUserWatchList(userId: ID!): [Movie]
         getUserWatchedMovies(id: ID!): [Movie]
         getUserDownloadedMovies(id: ID!): [Movie]
         getUserById(id: ID!): User

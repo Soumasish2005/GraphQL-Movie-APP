@@ -24,7 +24,6 @@ const createTables = async () => {
         avatar VARCHAR(255),
         "watchedMovies" JSONB DEFAULT '[]',
         "downloadedMovies" JSONB DEFAULT '[]',
-        "watchList" JSONB DEFAULT '[]',
         role VARCHAR(50),
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -64,6 +63,15 @@ const createTables = async () => {
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         "parentId" INT REFERENCES comments(id) ON DELETE CASCADE
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS user_watchlist (
+        id SERIAL PRIMARY KEY,
+        "userId" INT REFERENCES users(id) ON DELETE CASCADE,
+        "movieId" INT REFERENCES movies(id) ON DELETE CASCADE,
+        UNIQUE ("userId", "movieId")
       );
     `);
 

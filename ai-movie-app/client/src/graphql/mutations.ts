@@ -38,12 +38,12 @@ export const ADD_COMMENT = gql`
 `;
 
 export const ADD_TO_WATCHLIST = gql`
-  mutation AddToWatchList($userId: ID!, $movieId: ID!) {
+  mutation addToWatchList($userId: ID!, $movieId: ID!) {
     addToWatchList(userId: $userId, movieId: $movieId) {
       id
       watchList {
         id
-        name
+        title
         thumbnail
         rating
       }

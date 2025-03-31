@@ -42,6 +42,22 @@ export const resolvers = {
                 throw new Error('Error fetching user');
             }
         },
+        getUserWatchList: async (_, { userId }, { db }) => {
+            try {
+                const query = `
+                    SELECT m.*
+                    FROM user_watchlist uw
+                    JOIN movies m ON uw."movieId" = m.id
+                    WHERE uw."userId" = $1;
+                `;
+                const values = [userId];
+                const res = await db.query(query, values);
+                return res.rows; // Return the list of movies
+            } catch (err) {
+                console.error('Error fetching user watchlist:', err);
+                throw new Error('Error fetching user watchlist');
+            }
+        },
         filterMoviesByInput: async (_, { filter }, { db }) => {
             try {
                 const conditions = [];
@@ -179,6 +195,68 @@ export const resolvers = {
             const values = [name, directors, releaseYear, genre, rating, isInTheatres, studio, runtime];
             const newMovie = await writeToDB(db, query, values);
             return newMovie;
+        },
+        // addToWatchList: async (_, { userId, movieId }, { db }) => {
+        //     const updateUserQuery = `
+        //         UPDATE users
+        //         SET "watchList" = COALESCE("watchList", '[]'::jsonb) || to_jsonb($1::int)
+        //         WHERE id = $2
+        //         RETURNING *;
+        //     `;
+        //     const updateUserValues = [movieId, userId];
+        //     const updatedUser = await writeToDB(db, updateUserQuery, updateUserValues);
+
+        //     return updatedUser;
+        // },
+        addToWatchList: async (_, { userId, movieId }, { db }) => {
+            try {
+                const query = `
+                    INSERT INTO user_watchlist ("userId", "movieId")
+                    VALUES ($1, $2)
+                    ON CONFLICT ("userId", "movieId") DO NOTHING
+                    RETURNING *;
+                `;
+                const values = [userId, movieId];
+                await db.query(query, values);
+
+                // Fetch and return the updated user
+                const userQuery = 'SELECT * FROM users WHERE id = $1';
+                const userRes = await db.query(userQuery, [userId]);
+                const watchListQuery = `
+                    SELECT m.*
+                    FROM user_watchlist uw
+                    JOIN movies m ON uw."movieId" = m.id
+                    WHERE uw."userId" = $1;
+                `;
+                const watchListRes = await db.query(watchListQuery, [userId]);
+                return {
+                    ...userRes.rows[0],
+                    id: userId,
+                    watchList: watchListRes.rows,
+                };
+            } catch (err) {
+                console.error('Error adding to watchlist:', err);
+                throw new Error('Error adding to watchlist');
+            }
+        },
+        removeFromWatchList: async (_, { userId, movieId }, { db }) => {
+            try {
+                const query = `
+                    DELETE FROM user_watchlist
+                    WHERE "userId" = $1 AND "movieId" = $2
+                    RETURNING *;
+                `;
+                const values = [userId, movieId];
+                await db.query(query, values);
+
+                // Fetch and return the updated user
+                const userQuery = 'SELECT * FROM users WHERE id = $1';
+                const userRes = await db.query(userQuery, [userId]);
+                return userRes.rows[0];
+            } catch (err) {
+                console.error('Error removing from watchlist:', err);
+                throw new Error('Error removing from watchlist');
+            }
         },
         addMovies: async (_, { inputs }, { db }) => {
             const query = `

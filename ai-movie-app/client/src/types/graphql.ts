@@ -1,6 +1,6 @@
 export interface Movie {
   id: string;
-  name: string;
+  title: string;
   description?: string;
   isInTheatres: boolean;
   directors: string[];

@@ -71,27 +71,17 @@ export const GET_USER_PROFILE = gql`
       id
       name
       email
-      watchList {
-        id
-        name
-        thumbnail
-        rating
-        releaseYear
-      }
-      watchedMovies {
-        id
-        name
-        thumbnail
-        rating
-        releaseYear
-      }
-      downloadedMovies {
-        id
-        name
-        thumbnail
-        rating
-        releaseYear
-      }
+    }
+  }
+`;
+
+export const GET_USER_WATCHLIST = gql`
+  query GetUserWatchList($userId: ID!) {
+    getUserWatchList(userId: $userId) {
+      id
+      title
+      thumbnail
+      rating
     }
   }
 `;
