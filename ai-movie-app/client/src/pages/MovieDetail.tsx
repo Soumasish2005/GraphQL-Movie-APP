@@ -109,14 +109,14 @@ const MovieDetail = () => {
     <div className="min-h-screen pt-12">
       {/* Hero Section */}
       <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black-900 via-black-900/80 to-transparent z-10" />
         <div 
-          className="rounded-md w-full h-[60vh] bg-cover bg-center"
+          className=" mt-6 rounded-md w-full h-[90vh] bg-cover bg-center blur-sm"
           style={{ backgroundImage: `url(${movie.thumbnail})` }}
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 -mt-44 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 -mt-[64vh] sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Movie Poster */}
           <div className="lg:w-1/3">

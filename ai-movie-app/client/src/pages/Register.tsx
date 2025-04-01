@@ -22,13 +22,13 @@ const Register = () => {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <h2 className="text-2xl font-bold text-center mb-6">Create an Account</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && <p className="text-red-500">{error.message}</p>}
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-dark-900 to-dark-800 px-4">
+      <div className="w-full max-w-md bg-dark-800 rounded-lg p-8 border-blue-500/50 border-2 shadow-[0px_0px_75px_0px_rgba(3,_105,_206,_0.41)]">
+        <h2 className="text-3xl font-bold text-center text-white mb-6">Create an Account</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {error && <p className="text-red-500 text-center">{error.message}</p>}
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-300">
               Name
             </label>
             <input
@@ -36,12 +36,13 @@ const Register = () => {
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full p-2 rounded-md bg-dark-700 border border-gray-600 text-white shadow-sm outline-none focus:bg-dark-700 focus:border-2 focus:text-white focus:border-primary-500 focus:ring-primary-500"
+              placeholder="Enter your name"
               required
             />
           </div>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300">
               Email
             </label>
             <input
@@ -49,12 +50,13 @@ const Register = () => {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full p-2 rounded-md bg-dark-700 border border-gray-600 text-white shadow-sm outline-none focus:bg-dark-700 focus:border-2 focus:text-white focus:border-primary-500 focus:ring-primary-500"
+              placeholder="Enter your email"
               required
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-300">
               Password
             </label>
             <input
@@ -62,21 +64,22 @@ const Register = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full p-2 rounded-md bg-dark-700 border border-gray-600 shadow-sm outline-none focus:bg-dark-700 focus:border-2 focus:text-white focus:border-primary-500 focus:ring-primary-500"
+              placeholder="Enter your password"
               required
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors"
+            className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300"
             disabled={loading}
           >
             {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
-        <p className="mt-4 text-center text-sm text-gray-600">
+        <p className="mt-6 text-center text-sm text-gray-400">
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-500 hover:text-blue-600">
+          <Link to="/login" className="text-primary-400 hover:text-primary-500">
             Login
           </Link>
         </p>

@@ -1,175 +1,129 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, User, Film, LogOut, Menu, X, Heart } from 'lucide-react';
+import { useState } from 'react';
+import { Link} from 'react-router-dom';
+import { Search, Bell, Menu, X } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 
 export const Navbar = () => {
-  const { token, signout } = useAuthStore();
-  const [searchQuery, setSearchQuery] = useState('');
+  const { token} = useAuthStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const handleSignout = () => {
-    signout();
-    navigate('/login');
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Implement search functionality
-  };
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
-          ? 'bg-gray-900/95 backdrop-blur-md shadow-lg border-b border-gray-800'
-          : 'bg-transparent'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          <div className="flex items-center">
-            <Link
-              to="/"
-              className="flex items-center space-x-3 group"
-            >
-              <div className="relative">
-                <Film className="h-9 w-9 text-blue-500 transform transition-transform duration-300 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl transition-opacity duration-300 opacity-0 group-hover:opacity-100" />
-              </div>
-              <span className="text-2xl font-bold text-gradient">
-                MovieVerse
-              </span>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-dark-900/90 to-transparent backdrop-blur-sm">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo and Desktop Navigation */}
+          <div className="flex items-center space-x-8">
+            <Link to="/" className="text-2xl font-bold text-white hover:text-primary-400 transition-colors">
+              MovieVerse
             </Link>
+            <div className="hidden md:flex space-x-6">
+              <Link to="/" className="text-white hover:text-primary-400 transition-colors">Home</Link>
+              <Link to="/movies" className="text-white hover:text-primary-400 transition-colors">Movies</Link>
+              <Link to="/series" className="text-white hover:text-primary-400 transition-colors">Series</Link>
+              <Link to="/kids" className="text-white hover:text-primary-400 transition-colors">Kids</Link>
+            </div>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex md:flex-1 md:justify-center md:px-8">
-            <form onSubmit={handleSearch} className="w-full max-w-2xl">
-              <div className="relative group">
-                <input
-                  type="text"
-                  placeholder="Search movies..."
-                  className="input-field pl-11 pr-4 py-3 w-full"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 transition-colors duration-300 group-focus-within:text-blue-500" />
-              </div>
-            </form>
-          </div>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-5">
+          {/* Desktop Actions */}
+          <div className="hidden md:flex items-center space-x-6">
+            <button className="text-white hover:text-primary-400 transition-colors">
+              <Search className="w-6 h-6" />
+            </button>
+            <button className="text-white hover:text-primary-400 transition-colors">
+              <Bell className="w-6 h-6" />
+            </button>
             {token ? (
-              <>
-                <Link
-                  to="/watchlist"
-                  className="p-2 rounded-xl hover:bg-gray-800/50 transition-colors duration-300 relative group"
-                >
-                  <Heart className="h-6 w-6 text-gray-300 group-hover:text-blue-400 transition-colors duration-300" />
-                </Link>
-                <Link
-                  to="/profile"
-                  className="p-2 rounded-xl hover:bg-gray-800/50 transition-colors duration-300 relative group"
-                >
-                  <User className="h-6 w-6 text-gray-300 group-hover:text-blue-400 transition-colors duration-300" />
-                </Link>
-                <button
-                  onClick={handleSignout}
-                  className="p-2 rounded-xl hover:bg-gray-800/50 transition-colors duration-300 relative group"
-                  aria-label="Logout"
-                >
-                  <LogOut className="h-6 w-6 text-gray-300 group-hover:text-red-400 transition-colors duration-300" />
-                </button>
-              </>
+              <Link to="/profile">
+                <img 
+                  src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=faces" 
+                  alt="Profile" 
+                  className="w-10 h-10 rounded-full border-2 border-primary-500 hover:border-primary-400 transition-colors"
+                />
+              </Link>
             ) : (
-              <Link to="/login" className="btn-primary">
+              <Link 
+                to="/login" 
+                className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-colors"
+              >
                 Login
               </Link>
             )}
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button
+          <div className="md:hidden flex items-center space-x-4">
+            <button className="text-white hover:text-primary-400 transition-colors">
+              <Search className="w-6 h-6" />
+            </button>
+            <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-xl hover:bg-gray-800/50 transition-colors duration-300"
+              className="text-white hover:text-primary-400 transition-colors"
             >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden glass-effect border-t border-gray-800">
-          <div className="px-4 pt-2 pb-3 space-y-3">
-            <form onSubmit={handleSearch} className="mb-4">
-              <div className="relative group">
-                <input
-                  type="text"
-                  placeholder="Search movies..."
-                  className="input-field pl-11"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 transition-colors duration-300 group-focus-within:text-blue-500" />
-              </div>
-            </form>
-            
-            {token ? (
-              <>
-                <Link
-                  to="/watchlist"
-                  className="flex items-center space-x-3 px-3 py-2 rounded-xl hover:bg-gray-700/50 transition-colors duration-300"
-                >
-                  <Heart className="h-5 w-5" />
-                  <span>Watchlist</span>
-                </Link>
-                <Link
-                  to="/profile"
-                  className="flex items-center space-x-3 px-3 py-2 rounded-xl hover:bg-gray-700/50 transition-colors duration-300"
-                >
-                  <User className="h-5 w-5" />
-                  <span>Profile</span>
-                </Link>
-                <button
-                  onClick={handleSignout}
-                  className="flex items-center space-x-3 w-full text-left px-3 py-2 rounded-xl hover:bg-gray-700/50 transition-colors duration-300 text-red-400"
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span>Logout</span>
-                </button>
-              </>
-            ) : (
-              <Link
-                to="/login"
-                className="btn-primary w-full flex justify-center"
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 bg-dark-900/95 backdrop-blur-sm border-t border-white/10">
+            <div className="container mx-auto px-4 py-4 space-y-4">
+              <Link 
+                to="/" 
+                className="block text-white hover:text-primary-400 transition-colors py-2"
+                onClick={() => setIsMenuOpen(false)}
               >
-                Login
+                Home
               </Link>
-            )}
+              <Link 
+                to="/movies" 
+                className="block text-white hover:text-primary-400 transition-colors py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Movies
+              </Link>
+              <Link 
+                to="/series" 
+                className="block text-white hover:text-primary-400 transition-colors py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Series
+              </Link>
+              <Link 
+                to="/kids" 
+                className="block text-white hover:text-primary-400 transition-colors py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Kids
+              </Link>
+              <div className="pt-4 border-t border-white/10">
+                {token ? (
+                  <Link 
+                    to="/profile" 
+                    className="flex items-center space-x-3"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <img 
+                      src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=faces" 
+                      alt="Profile" 
+                      className="w-10 h-10 rounded-full border-2 border-primary-500"
+                    />
+                    <span className="text-white">My Profile</span>
+                  </Link>
+                ) : (
+                  <Link 
+                    to="/login" 
+                    className="block bg-primary-500 hover:bg-primary-600 text-white text-center px-4 py-2 rounded-lg transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </nav>
   );
 };

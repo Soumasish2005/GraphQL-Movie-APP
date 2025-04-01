@@ -38,9 +38,9 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <Router>
-        <div className="min-h-screen bg-gray-900">
+        <div className="min-h-screen w-full bg-gray-900">
           <Navbar />
-          <main className="container mx-auto px-4 py-8">
+          <main className="w-full">
             <React.Suspense
               fallback={
                 <div className="flex items-center justify-center h-screen">

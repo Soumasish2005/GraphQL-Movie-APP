@@ -82,6 +82,10 @@ export const GET_USER_WATCHLIST = gql`
       title
       thumbnail
       rating
+      releaseYear
+      runtime
+      genres
+      description
     }
   }
 `;

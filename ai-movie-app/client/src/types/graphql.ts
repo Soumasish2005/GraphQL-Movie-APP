@@ -5,7 +5,7 @@ export interface Movie {
   isInTheatres: boolean;
   directors: string[];
   releaseYear: number;
-  genre: string[];
+  genres: string[];
   rating: number;
   studio: string;
   runtime: number;
