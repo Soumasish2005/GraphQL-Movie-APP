@@ -23,6 +23,122 @@ export const REGISTER_USER = gql`
   }
 `;
 
+
+export const DELETE_USER = gql`
+  mutation DeleteUser($id: ID!) {
+    deleteUser(id: $id) {
+      id
+    }
+  }
+`;
+
+export const DELETE_MOVIE = gql`
+  mutation DeleteMovie($id: ID!) {
+    deleteMovie(id: $id) {
+      id
+    }
+  }
+`;
+
+export const DELETE_COMMENT = gql`
+  mutation DeleteComment($id: ID!) {
+    deleteComment(id: $id) {
+      id
+    }
+  }
+`;
+
+export const ADD_MOVIE = gql`
+  mutation AddMovie($input: MovieInput!) {
+    addMovie(input: $input) {
+      id
+      title
+      isInTheatres
+      description
+      thumbnail
+      downloadLinks
+      watchLinks
+      directors
+      releaseYear
+      genres
+      rating
+      studio
+      runtime
+    }
+  }
+`;
+
+export const UPDATE_MOVIE = gql`
+  mutation UpdateMovie($id: ID!, $input: MovieInput!) {
+    updateMovie(id: $id, input: $input) {
+      id
+      title
+    }
+  }
+`;
+
+export const UPDATE_USER = gql`
+  mutation UpdateUser($id: ID!, $input: UserInput!) {
+    updateUser(id: $id, input: $input) {
+      id
+      name
+      email
+    }
+  }
+`;
+
+export const ADD_REPLY = gql`
+  mutation AddReply($commentId: ID!, $text: String!) {
+    addReply(commentId: $commentId, text: $text) {
+      id
+      text
+      createdAt
+      user {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const UPDATE_COMMENT = gql`
+  mutation UpdateComment($id: ID!, $text: String!) {
+    updateComment(id: $id, text: $text) {
+      id
+      text
+      createdAt
+      user {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const UPDATE_REPLY = gql`
+  mutation UpdateReply($id: ID!, $text: String!) {
+    updateReply(id: $id, text: $text) {
+      id
+      text
+      createdAt
+      user {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const DELETE_REPLY = gql`
+  mutation DeleteReply($id: ID!) {
+    deleteReply(id: $id) {
+      id
+    }
+  }
+`;
+
+
+
 export const ADD_COMMENT = gql`
   mutation AddComment($userId: ID!, $movieId: ID!, $text: String!) {
     addComment(userId: $userId, movieId: $movieId, text: $text) {
@@ -57,7 +173,7 @@ export const REMOVE_FROM_WATCHLIST = gql`
       id
       watchList {
         id
-        name
+        title
         thumbnail
         rating
       }

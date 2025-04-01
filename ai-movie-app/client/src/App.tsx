@@ -3,6 +3,15 @@ import { ApolloProvider } from '@apollo/client';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { client } from './lib/apollo';
 import { Navbar } from './components/Navbar';
+import UserWatchlist from './pages/UserWatchlist';
+import TrendingMovies from './pages/TrendingMovies';
+import PopularMovies from './pages/PopularMovies';
+import UpcomingMovies from './pages/UpcomingMovies';
+import Movies from './pages/Movies';
+import WatchMovie from './pages/WatchMovie';
+import Admin from './pages/Admin';
+// import ManageMovies from './admin/ManageMovies';
+// import AddMovie from './admin/AddMovie';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -51,6 +60,13 @@ function App() {
               <ErrorBoundary>
                 <Routes>
                   <Route path="/" element={<Home />} />
+                  <Route path="/admin/*" element={<Admin />} />
+                  <Route path='/watchlist' element={<UserWatchlist />} />
+                  <Route path="/trending" element={<TrendingMovies />} />
+                  <Route path="/popular" element={<PopularMovies />} />
+                  <Route path="/upcoming" element={<UpcomingMovies />} />
+                  <Route path="/movies" element={<Movies />} />
+                  <Route path='/watch/movie/:id' element={<WatchMovie />}/>
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/movie/:id" element={<MovieDetail />} />

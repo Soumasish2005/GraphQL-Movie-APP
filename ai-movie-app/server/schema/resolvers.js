@@ -18,9 +18,23 @@ export const resolvers = {
         getAllUsers: async (_, __, { db }) => {
             try {
                 console.log('Fetching all users from the database...');
-                const res = await db.query('SELECT * FROM users');
-                console.log('Users fetched successfully:', res.rows);
-                return res.rows;
+                const usersQuery = 'SELECT * FROM users';
+                const usersRes = await db.query(usersQuery);
+                const users = usersRes.rows;
+
+                for (const user of users) {
+                    const watchListQuery = `
+                        SELECT m.*
+                        FROM user_watchlist uw
+                        JOIN movies m ON uw."movieId" = m.id
+                        WHERE uw."userId" = $1;
+                    `;
+                    const watchListRes = await db.query(watchListQuery, [user.id]);
+                    user.watchList = watchListRes.rows; // Add watchlist to each user
+                }
+
+                console.log('Users fetched successfully:', users);
+                return users;
             } catch (err) {
                 console.error('Error fetching users:', err);
                 throw new Error('Error fetching users');
@@ -36,6 +50,17 @@ export const resolvers = {
                 if (!user) {
                     throw new Error('No user found with this ID');
                 }
+
+                // Fetch movies from watchlist
+                const watchListQuery = `
+                    SELECT m.*
+                    FROM user_watchlist uw
+                    JOIN movies m ON uw."movieId" = m.id
+                    WHERE uw."userId" = $1;
+                `;
+                const watchListRes = await db.query(watchListQuery, [id]);
+                user.watchList = watchListRes.rows;
+
                 return user;
             } catch (err) {
                 console.error('Error fetching user:', err);
@@ -176,38 +201,86 @@ export const resolvers = {
             return updatedUser;
         },
         deleteUser: async (_, { id }, { db }) => {
+            try {
+                // Delete associated comments
+                const deleteCommentsQuery = `
+                    DELETE FROM comments
+                    WHERE "userId" = $1;
+                `;
+                await db.query(deleteCommentsQuery, [id]);
+
+                // Delete the user
+                const query = `
+                    DELETE FROM users
+                    WHERE id = $1
+                    RETURNING *;
+                `;
+                const values = [id];
+                const deletedUser = await writeToDB(db, query, values);
+                return deletedUser;
+            } catch (err) {
+                console.error('Error deleting user:', err);
+                throw new Error('Error deleting user');
+            }
+        },
+        addMovie: async (_, { input }, { db }) => {
+            try {
+                console.log('Adding movie to the database...', input);
+                const { title, description, isInTheatres, directors, actors, languages, releaseYear, genres, rating, studio, runtime, thumbnail, downloadLinks, watchLinks, trailer } = input;
+                const query = `
+                    INSERT INTO movies ("title","description", "isInTheatres", "directors", "actors", "languages", "releaseYear", "genres", "rating", "studio", "runtime", "thumbnail", "downloadLinks", "watchLinks", "trailer")
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+                    RETURNING *;
+                `;
+                const values = [title, description || null, isInTheatres, directors || null, actors || null, languages || null, releaseYear, genres || null, rating, studio, runtime, thumbnail, downloadLinks || null, watchLinks || null, trailer];
+                const newMovie = await writeToDB(db, query, values);
+                return newMovie;
+            } catch (err) {
+                console.error('Error adding movie:', err);
+                throw new Error('Error adding movie');
+            }
+        },
+        updateMovie: async (_, { id, input }, { db }) => {
+            const fields = [];
+            const values = [];
+            let index = 1;
+
+            for (const [key, value] of Object.entries(input)) {
+                fields.push(`"${key}" = $${index++}`);
+                values.push(value);
+            }
+
+            values.push(id); // Add the movie ID as the last value
+
             const query = `
-                DELETE FROM users
+                UPDATE movies
+                SET ${fields.join(', ')}
+                WHERE id = $${index}
+                RETURNING *;
+            `;
+
+            const updatedMovie = await writeToDB(db, query, values);
+            return updatedMovie;
+        },
+        deleteMovie: async (_, { id }, { db }) => {
+            const query = `
+                DELETE FROM movies
                 WHERE id = $1
                 RETURNING *;
             `;
             const values = [id];
-            const deletedUser = await writeToDB(db, query, values);
-            return deletedUser;
-        },
-        addMovie: async (_, { input }, { db }) => {
-            const { name, directors, releaseYear, genre, rating, isInTheatres, studio, runtime } = input;
-            const query = `
-                INSERT INTO movies ("name", "directors", "releaseYear", "genre", "rating", "isInTheatres", "studio", "runtime")
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                RETURNING *;
+            const deletedMovie = await writeToDB(db, query, values);
+            console.log(`Movie with ID ${id} deleted successfully.`);
+            // Optionally, delete associated comments
+            const deleteCommentsQuery = `
+                DELETE FROM comments
+                WHERE "movieId" = $1;
             `;
-            const values = [name, directors, releaseYear, genre, rating, isInTheatres, studio, runtime];
-            const newMovie = await writeToDB(db, query, values);
-            return newMovie;
+            const deleteCommentsValues = [id];
+            await db.query(deleteCommentsQuery, deleteCommentsValues);
+            console.log(`Comments associated with movie ID ${id} deleted successfully.`);
+            return deletedMovie;
         },
-        // addToWatchList: async (_, { userId, movieId }, { db }) => {
-        //     const updateUserQuery = `
-        //         UPDATE users
-        //         SET "watchList" = COALESCE("watchList", '[]'::jsonb) || to_jsonb($1::int)
-        //         WHERE id = $2
-        //         RETURNING *;
-        //     `;
-        //     const updateUserValues = [movieId, userId];
-        //     const updatedUser = await writeToDB(db, updateUserQuery, updateUserValues);
-
-        //     return updatedUser;
-        // },
         addToWatchList: async (_, { userId, movieId }, { db }) => {
             try {
                 const query = `
@@ -358,27 +431,5 @@ export const resolvers = {
                 user,
             };
         },
-        updateMovie: async (_, { id, input }, { db }) => {
-            const fields = [];
-            const values = [];
-            let index = 1;
-
-            for (const [key, value] of Object.entries(input)) {
-                fields.push(`"${key}" = $${index++}`);
-                values.push(value);
-            }
-
-            values.push(id); // Add the movie ID as the last value
-
-            const query = `
-                UPDATE movies
-                SET ${fields.join(', ')}
-                WHERE id = $${index}
-                RETURNING *;
-            `;
-
-            const updatedMovie = await writeToDB(db, query, values);
-            return updatedMovie;
-        }
     }
 };

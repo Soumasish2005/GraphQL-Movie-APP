@@ -29,7 +29,7 @@ const Profile = () => {
   }, [error, watchListError]);
 
   const handleLogout = () => {
-    localStorage.removeItem('userId'); // Clear user data
+    signout();
     navigate('/login'); // Redirect to login page
   };
 

@@ -20,6 +20,38 @@ export const GET_ALL_MOVIES = gql`
   }
 `;
 
+export const GET_ALL_USERS = gql`
+  query GetAllUsers {
+    getAllUsers {
+      id
+      name
+      email
+      role
+      watchList {
+        id
+        title
+        thumbnail
+        rating
+      }
+    }
+  }
+`;
+
+export const GET_USER_BY_ID = gql`
+  query GetUserById($id: ID!) {
+    getUserById(id: $id) {
+      id
+      name
+      email
+      watchList {
+        id
+        title
+        thumbnail
+        rating
+      }
+    }
+  }
+`;
 export const GET_MOVIE_DETAIL = gql`
   query GetMovieDetail($id: ID!) {
     getMovieById(id: $id) {

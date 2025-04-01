@@ -13,11 +13,17 @@ export interface Movie {
   downloadLinks?: string[];
   watchLinks?: string[];
 }
-
+enum Role {
+  REGULAR,
+  ADMIN
+}
 export interface User {
   id: string;
   name: string;
   email: string;
+  avatar: string;
+  role: Role;
+  createdAt: string
   watchList?: Movie[];
   watchedMovies?: Movie[];
   downloadedMovies?: Movie[];

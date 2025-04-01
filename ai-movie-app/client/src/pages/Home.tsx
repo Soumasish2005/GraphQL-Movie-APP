@@ -3,8 +3,15 @@ import { useQuery } from '@apollo/client';
 import { GET_ALL_MOVIES } from '../graphql/queries';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { Link } from 'react-router-dom';
+import { Movie } from '../types/graphql';
 
-const MovieRow = ({ title, movies, loading }) => (
+interface MovieRowProps {
+  title: string;
+  movies: Movie[];
+  loading: boolean;
+}
+
+const MovieRow = ({ title, movies, loading }: MovieRowProps) => (
   <div className="mb-8 sm:mb-12">
     <div className="flex items-center justify-between mb-4 sm:mb-6">
       <h2 className="text-xl sm:text-2xl font-bold">{title}</h2>
@@ -18,10 +25,10 @@ const MovieRow = ({ title, movies, loading }) => (
           <div key={i} className="aspect-[2/3] rounded-xl bg-dark-800 animate-pulse" />
         ))
       ) : (
-        movies?.map((movie) => (
+        movies?.map((movie: Movie) => (
           <Link 
             key={movie.id} 
-            to={`/movie/${movie.id}`}
+            to={`/movie/${movie.id}`} // Ensure id is used correctly
             className="group relative overflow-hidden rounded-xl"
           >
             <div className="aspect-[2/3] overflow-hidden rounded-xl">
@@ -44,6 +51,7 @@ const MovieRow = ({ title, movies, loading }) => (
 
 const Home = () => {
   const { loading, error, data } = useQuery(GET_ALL_MOVIES);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [featuredMovies, setFeaturedMovies] = useState([]);
 
@@ -68,7 +76,12 @@ const Home = () => {
     );
   }
 
-  const getMoviesByCategory = (start, end) => {
+  interface GetMoviesByCategoryParams {
+    start: number;
+    end: number;
+  }
+
+  const getMoviesByCategory = (start: GetMoviesByCategoryParams['start'], end: GetMoviesByCategoryParams['end']): Movie[] => {
     return data?.getAllMovies.slice(start, end) || [];
   };
 

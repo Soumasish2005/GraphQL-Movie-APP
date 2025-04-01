@@ -50,19 +50,21 @@ export const typeDefs = gql`
         trailer: String
     }
     input MovieInput {
-        name: String
-        isInTheatres: Boolean
+        title: String!
         description: String
-        thumbnail: String
-        downloadLinks: [String]
-        watchLinks: [String]
-        comments: [String]
+        isInTheatres: Boolean
         directors: [String]
+        actors: [String]
+        languages: [String]
         releaseYear: Int
-        genre: [String]
+        genres: [String]
         rating: Float
         studio: String
         runtime: Int
+        thumbnail: String
+        downloadLinks: [String]
+        watchLinks: [String]
+        trailer: String
     }
     type Query {
         getAllUsers: [User!]!
